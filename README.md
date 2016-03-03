@@ -11,7 +11,7 @@
 3) node server.js (or click node.js/build.bat)
 
 ##包层次依赖关系
-
+```
 <!-- level 1：最基础的平台 -->
 js/bootstrap.js
 
@@ -37,3 +37,4 @@ js/component/EarthCanvas.js
 
 <!-- level 5 启动入口 —>
 js/main.js
+```
