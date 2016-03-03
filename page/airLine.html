@@ -1,0 +1,198 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+<title>Air line chart</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<!-- level 1 -->
+<script type="text/javascript" src="js/bootstrap.js"></script>
+
+<!-- level 2 -->
+<script type="text/javascript" src="js/gl/vector.js"></script>
+<script type="text/javascript" src="js/gl/matrix4x4.js"></script>
+<script type="text/javascript" src="js/gl/mesh.js"></script>
+<script type="text/javascript" src="js/gl/shader.js"></script>
+<script type="text/javascript" src="js/gl/texture.js"></script>
+
+<!-- level 3 -->
+<script type="text/javascript" src="js/event/Dispatcher.js"></script>
+<script type="text/javascript" src="js/event/Events.js"></script>
+<script type="text/javascript" src="js/manager/dragMgr.js"></script>
+<script type="text/javascript" src="js/manager/labelMgr.js"></script>
+<script type="text/javascript" src="js/manager/behaviorMgr.js"></script>
+<script type="text/javascript" src="js/util/bezier.js"></script>
+<script type="text/javascript" src="js/util/Timer.js"></script>
+
+<!-- level 4 -->
+<script type="text/javascript" src="js/component/ControlPanel.js"></script>
+<script type="text/javascript" src="js/component/EarthCanvas.js"></script>
+
+<!-- level 5 -->
+<script type="text/javascript" src="js/main.js"></script>
+
+<style type="text/css">
+.display-item {
+	margin-top: 2px;
+	border-style: solid;
+	border-width: 1px;
+	padding-left: 2px;
+	cursor: pointer;
+}
+
+.close-button {
+	text-align: center;
+	width: 20px;
+	cursor: pointer;
+	float: right;
+}
+
+.city-label {
+    display: none;
+    border-style: none;
+    background-color: rgba(255, 255, 255, 0.7);
+    position: absolute;
+    padding: 2px 4px;
+}
+
+</style>
+
+<script id="line-fs" type="x-shader/x-fragment">
+  precision mediump float;
+
+  uniform bool uSelect;
+
+  void main(void) {
+
+    if (uSelect) {
+      gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+    } else {
+      gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    }
+  }
+
+</script>
+
+<script id="line-vs" type="x-shader/x-vertex">
+  attribute vec3 aVertexPosition;
+
+  uniform mat4 uMVMatrix;
+  uniform mat4 uPMatrix;
+
+  void main(void) {
+    gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+  }
+
+</script>
+
+<script id="shader-fs" type="x-shader/x-fragment">
+
+    precision mediump float;
+
+    varying vec2 vTextureCoord;
+    varying vec3 vLightWeighting;
+
+    uniform sampler2D uSampler;
+
+    void main(void) {
+        vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+        gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);
+    }
+</script>
+
+<script id="shader-vs" type="x-shader/x-vertex">
+    attribute vec3 aVertexPosition;
+    attribute vec3 aVertexNormal;
+    attribute vec2 aTextureCoord;
+
+    uniform mat4 uMVMatrix;
+    uniform mat4 uPMatrix;
+    uniform mat4 uNMatrix;
+
+    uniform vec3 uAmbientColor;
+
+    uniform vec3 uLightingDirection;
+    uniform vec3 uDirectionalColor;
+
+    uniform bool uUseLighting;
+
+    varying vec2 vTextureCoord;
+    varying vec3 vLightWeighting;
+
+    void main(void) {
+        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+        vTextureCoord = aTextureCoord;
+
+        if (!uUseLighting) {
+            vLightWeighting = vec3(1.0, 1.0, 1.0);
+        } else {
+            vec3 transformedNormal = (uNMatrix * vec4(aVertexNormal, 1.0)).xyz;
+            float directionalLightWeighting = max(dot(transformedNormal, uLightingDirection), 0.0);
+            vLightWeighting = uAmbientColor + uDirectionalColor * directionalLightWeighting;
+        }
+    }
+</script>
+
+</head>
+
+<body>
+	<br />
+
+	<div>
+		<span id="container" style="position:relative;display:inline-block;">
+			<canvas id="canvas" style="border: none;" width="1000" height="1000"></canvas>
+		</span>
+		<div id="controlPanel" style="vertical-align: top; display: inline-block;">
+			<div>
+				<div style="display: inline-block;">
+					<fieldset style="width: 260px;">
+						<legend>Start Point</legend>
+						<table>
+							<tr>
+								<td>longitude:</td>
+								<td><input id="startLongitude" type="range" min="0" max="360" step="1" class="start-longitude"/></td>
+								<td id="displayStartLongitude"></td>
+							</tr>
+							<tr>
+								<td>latitude:</td>
+								<td><input id="startLatitude" type="range" min="-90" max="90" step="1" class="start-latitude"/></td>
+								<td id="displayStartLatitude"></td>
+							</tr>
+						</table>
+					</fieldset>
+					<fieldset style="width: 260px;">
+						<legend>End Point</legend>
+						<table>
+							<tr>
+								<td>longitude:</td>
+								<td><input id="endLongitude" type="range" min="0" max="360" step="1" class="end-longitude"/></td>
+								<td id="displayEndLongitude"></td>
+							</tr>
+							<tr>
+								<td>latitude:</td>
+								<td><input id="endLatitude" type="range" min="-90" max="90" step="1" class="end-latitude"/></td>
+								<td id="displayEndLatitude"></td>
+							</tr>
+						</table>
+					</fieldset>
+				</div>
+				<div style="display: inline-block;">
+					<input type="button" value="Add path" class="add-airline-path"/>
+				</div>
+			</div>
+			<div style="margin-top: 4px;">
+				Display List (Clicking row will select an air line):
+				<div id="console"></div>
+			</div>
+		</div>
+
+	</div>
+
+	<div>
+		<div>
+			<input type="checkbox" id="lighting" checked /><label for="lighting">Enable light</label>
+		</div>
+		<div style="color: red;">Drag & drop earth to rotate</div>
+	</div>
+</body>
+</html>
