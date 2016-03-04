@@ -6,6 +6,7 @@ air.define("air.component.ControlPanel", function() {
     var Events = air.require("air.event.Events");
     
     function translateLongitude(value) {
+        value = Number(value);
         if (value >= 180) {
             return (value - 180) + 'W';
         } else {
@@ -14,6 +15,7 @@ air.define("air.component.ControlPanel", function() {
     }
 
     function translateLatitude(value) {
+        value = Number(value);
         if (value > 0) {
             return value + "N";
         } else {
@@ -112,7 +114,7 @@ air.define("air.component.ControlPanel", function() {
         target: "end-latitude",
         eventType: "change",
         callback : function(target) {
-            showValue(translateLongitude(target.value), 'displayEndLatitude');
+            showValue(translateLatitude(target.value), 'displayEndLatitude');
         }
     }, {
         target: "add-airline-path",
