@@ -1,20 +1,26 @@
 air.define("air.management.BehaviorManager", function() {
     "use strict";
     
+    var doc = document;
+    
     var BehaviorManager = {
         handlerMap : {},
         register : function(elementId, config) {
 
-            if (this.handlerMap[elementId] != null) {
-                this.handlerMap[elementId].push(config);
+            if (this.handlerMap[elementId] == null) {
+                this.handlerMap[elementId] = {};
+            }
+            
+            var handlerMapper = this.handlerMap[elementId];
+            var eventType = config.eventType;
+            if (handlerMapper[eventType] != null) {
+                handlerMapper[eventType].push(config);
                 return;
             }
 
-            this.handlerMap[elementId] = [ config ];
+            handlerMapper[eventType] = [ config ];
 
-            var targetThis = this;
-
-            var handler = (function(id) {
+            var handler = (function(handlerMap) {
                 return function(e) {
 
                     var event = e || window.event;
@@ -22,7 +28,7 @@ air.define("air.management.BehaviorManager", function() {
 
                     var targetClass = target.className;
 
-                    var handlers = targetThis.handlerMap[id];
+                    var handlers = handlerMap[e.type];
 
                     for (var i = 0; i < handlers.length; i++) {
                         if (targetClass.indexOf(handlers[i].target) == -1) {
@@ -30,11 +36,10 @@ air.define("air.management.BehaviorManager", function() {
                         }
                         handlers[i].callback(target);
                     }
-
                 };
-            })(elementId);
+            })(handlerMapper);
 
-            document.getElementById(elementId).addEventListener(config.eventType, handler, false);
+            doc.getElementById(elementId).addEventListener(config.eventType, handler, false);
         }
     };
     
