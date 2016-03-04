@@ -3,11 +3,13 @@ air.define("air.management.DragManager", function() {
     "use strict";
     
     var doc = document;
-    var mouseDown, lastMouseX, lastMouseY;
+    var mouseDown = false, isPinch = false, lastMouseX, lastMouseY;
     
     function handleMouseDown(event) {
         
-        if (event.type === "touchstart" && event.touches.length !== 1) {
+        if (event.touches && event.touches.length > 1) {
+            isPinch = true;
+            mouseDown = false;
             return;
         }
         
@@ -15,10 +17,13 @@ air.define("air.management.DragManager", function() {
         lastMouseX = event.clientX || event.touches[0].clientX;
         lastMouseY = event.clientY || event.touches[0].clientY;
         
-        event.preventDefault();
+        // to detect pinch
+        //event.preventDefault();
     }
 
     function handleMouseUp(event) {
+        
+        isPinch = false;
         
         if (!mouseDown) {
             return;
@@ -30,8 +35,13 @@ air.define("air.management.DragManager", function() {
 
     function handleMouseMoveWrapper(mouseMoveHandler) {
         return function(event) {
-            if (!mouseDown ||
-                (event.type === "touchmove" && event.touches.length !== 1)) {
+            if (!mouseDown) {
+                return;
+            }
+            
+            if (isPinch) {
+                isPinch = false;
+                mouseDown = false;
                 return;
             }
             
