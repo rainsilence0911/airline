@@ -31,7 +31,7 @@ air.define("air.management.BehaviorManager", function() {
                     var handlers = handlerMap[e.type];
 
                     for (var i = 0; i < handlers.length; i++) {
-                        if (targetClass.indexOf(handlers[i].target) == -1) {
+                        if (targetClass.indexOf(handlers[i].target) === -1) {
                             continue;
                         }
                         handlers[i].callback(target);
