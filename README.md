@@ -10,6 +10,8 @@
 
 3) node server.js (or click node.js/build.bat)
 
+4) open browser and input http://localhost:8080/airLine.html
+
 ##包层次依赖关系
 ```
 <!-- level 1：最基础的平台 -->
