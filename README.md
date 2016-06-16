@@ -6,9 +6,9 @@
 
 1) clone code
 
-2) install node
+2) install node.js
 
-3) node server.js (or click node.js/build.bat)
+3) npm start
 
 4) open browser and input http://localhost:8080/airLine.html
 
