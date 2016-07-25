@@ -2,7 +2,14 @@
 
 本项目意在用最轻量级的架构实现3d airline，除了使用node实现了测试服务器外，对第三方包的依赖为零。
 
-###效果图(只要是支持webgl的浏览器都可以浏览，支持手机上的pinch－spread缩放)
+###功能
+1）只要是支持webgl的浏览器都可以浏览，支持手机上的pinch－spread缩放
+2）电光源光照
+3）基于城市的data label，地球背面的label自动消失
+4）自定义创建航线，选中航线
+5）模块化的代码风格，模块与模块之间尽可能的解藕
+
+###效果图
 ![image](https://github.com/rainsilence0911/airline/blob/master/image/snapshot.png)
 
 ##How to install
