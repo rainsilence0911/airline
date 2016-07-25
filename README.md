@@ -2,6 +2,9 @@
 
 本项目意在用最轻量级的架构实现3d airline，除了使用node实现了测试服务器外，对第三方包的依赖为零。
 
+###效果图
+![image](https://github.com/rainsilence0911/airline/blob/master/image/snapshot.png)
+
 ##How to install
 
 1) clone code
