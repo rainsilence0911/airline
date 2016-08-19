@@ -104,18 +104,6 @@ air.define("air.gl.Shader", function() {
         
         return shader;
     };
-    
-    
-    function isArray(obj) {
-        var str = Object.prototype.toString.call(obj);
-        return str == '[object Array]' || str == '[object Float32Array]';
-    }
-
-    function isNumber(obj) {
-        var str = Object.prototype.toString.call(obj);
-        return str == '[object Number]' || str == '[object Boolean]';
-    }
-    
 
     Shader.prototype = {
         
@@ -237,48 +225,53 @@ air.define("air.gl.Shader", function() {
                     value = value.m;
                 }
                 
-                if (isArray(value)) {
-                    switch (value.length) {
-                    case 1:
-                        gl.uniform1fv(location, new Float32Array(value));
+                var valueType = Object.prototype.toString.call(value);
+
+                switch(valueType) {
+                    case '[object Array]':
+                    case '[object Float32Array]':
+                        switch (value.length) {
+                            case 1:
+                                gl.uniform1fv(location, new Float32Array(value));
+                                break;
+                            case 2:
+                                gl.uniform2fv(location, new Float32Array(value));
+                                break;
+                            case 3:
+                                gl.uniform3fv(location, new Float32Array(value));
+                                break;
+                            case 4:
+                                gl.uniform4fv(location, new Float32Array(value));
+                                break;
+                            // Matrices are automatically transposed, since WebGL uses column-major
+                            // indices instead of row-major indices.
+                            case 9:
+                                gl.uniformMatrix3fv(location, false, new Float32Array(value));
+                                break;
+                            case 16:
+                                gl.uniformMatrix4fv(location, false, new Float32Array(value));
+                                break;
+                            default:
+                                throw 'don\'t know how to load uniform "' + name
+                                        + '" of length ' + value.length;
+                        }
                         break;
-                    case 2:
-                        gl.uniform2fv(location, new Float32Array(value));
+                    case '[object Number]':
+                        gl.uniform1f(location, value);
                         break;
-                    case 3:
-                        gl.uniform3fv(location, new Float32Array(value));
-                        break;
-                    case 4:
-                        gl.uniform4fv(location, new Float32Array(value));
-                        break;
-                    // Matrices are automatically transposed, since WebGL uses column-major
-                    // indices instead of row-major indices.
-                    case 9:
-                        gl.uniformMatrix3fv(location, false, new Float32Array(value));
-                        break;
-                    case 16:
-                        gl.uniformMatrix4fv(location, false, new Float32Array(value));
+                    case '[object Boolean]':
+                        gl.uniform1i(location, value);
                         break;
                     default:
-                        throw 'don\'t know how to load uniform "' + name
-                                + '" of length ' + value.length;
-                    }
-                } else if (isNumber(value)) {
-                    
-                    gl.uniform1f(location, value);
-//                    (this.isSampler[name] ? gl.uniform1i : gl.uniform1f).call(
-//                            gl, location, value);
-                } else {
-                    
-                    if (this.isSampler[name]) {
-                        gl.activeTexture(gl.TEXTURE0 + value.id);
-                        gl.bindTexture(value.type, value.texture);
-                        gl.uniform1i(location, value.id);
-                        continue;
-                    }
-                    
-                    throw 'attempted to set uniform "' + name
-                            + '" to invalid value ' + value;
+                        if (this.isSampler[name]) {
+                            gl.activeTexture(gl.TEXTURE0 + value.id);
+                            gl.bindTexture(value.type, value.texture);
+                            gl.uniform1i(location, value.id);
+                            continue;
+                        }
+                        
+                        throw 'attempted to set uniform "' + name
+                                + '" to invalid value ' + value;
                 }
             }
 
