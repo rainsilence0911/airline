@@ -1,5 +1,5 @@
 /**
- * �����Ⱦ���任��
+ * 列优先矩阵
  * 
  * m[0], m[4], m[8], m[12],
  * m[1], m[5], m[9], m[13],
@@ -66,7 +66,7 @@ air.define("air.gl.Matrix", function() {
     };
 
     /**
-     * ����
+     * 放大缩小
      */
     Matrix.prototype.scale = function(x, y, z) {
         var scaleMatrix = Matrix.multiply(this, Matrix.scale(x, y, z));
@@ -75,7 +75,7 @@ air.define("air.gl.Matrix", function() {
     };
 
     /**
-     * ƽ��
+     * 平移
      */
     Matrix.prototype.translate = function(x, y, z) {
         var translateMatrix = Matrix.multiply(this, Matrix.translate(x, y, z));
@@ -84,7 +84,7 @@ air.define("air.gl.Matrix", function() {
     };
 
     /**
-     * ��ת
+     * 旋转
      */
     Matrix.prototype.rotate = function(angle, x, y, z) {
         var rotateMatrix = Matrix.multiply(this, Matrix.rotate(angle, x, y, z));
@@ -93,7 +93,7 @@ air.define("air.gl.Matrix", function() {
     };
 
     /**
-     * �õ���ת�þ���
+     * 逆转置
      */
     Matrix.prototype.inverseTranspose = function() {
         return Matrix.transpose(Matrix.inverse(this.clone()));
@@ -104,7 +104,7 @@ air.define("air.gl.Matrix", function() {
     };
 
     /**
-     * ת��
+     * 转置
      */
     Matrix.transpose = function(matrix) {
         var m = matrix.m;
@@ -135,7 +135,7 @@ air.define("air.gl.Matrix", function() {
     };
 
     /**
-     * ��������
+     * 矩阵求逆
      */
     Matrix.inverse = function(matrix) {
         var result = new Matrix();
@@ -167,7 +167,7 @@ air.define("air.gl.Matrix", function() {
     };
 
     /**
-     * ����˷�
+     * 矩阵乘法
      * m[0], m[4], m[8], m[12],
      * m[1], m[5], m[9], m[13],
      * m[2], m[6], m[10], m[14],
@@ -208,7 +208,7 @@ air.define("air.gl.Matrix", function() {
     };
 
     /**
-     * ƽ�ƾ���
+     * 矩阵移动
      */
     Matrix.translate = function(x, y, z) {
         var matrix = new Matrix();
@@ -219,7 +219,7 @@ air.define("air.gl.Matrix", function() {
     };
 
     /**
-     * ���ž���
+     * 矩阵缩放
      */
     Matrix.scale = function(x, y, z) {
         var matrix = new Matrix();
@@ -230,7 +230,7 @@ air.define("air.gl.Matrix", function() {
     };
 
     /**
-     * ����Ƕ���ת
+     * 矩阵旋转
      */
     Matrix.rotate = function(angle, x, y, z) {
         var mag = Math.sqrt(x * x + y * y + z * z);
