@@ -2,7 +2,7 @@
 
 本项目意在用最轻量级的架构实现3d airline，除了使用node实现了测试服务器外，对第三方包的依赖为零。
 
-###功能
+### 功能
 1）只要是支持webgl的浏览器都可以浏览，
 
 2）支持球体任意角度旋转，及手机上的pinch－spread缩放
@@ -18,10 +18,10 @@
 7）原创webgl绘图引擎
 
 
-###效果图
+### 效果图
 ![image](https://github.com/rainsilence0911/airline/blob/master/image/snapshot.png)
 
-##How to install
+## How to install
 
 1) clone code
 
@@ -31,7 +31,7 @@
 
 4) open browser and input http://localhost:8080/airLine.html
 
-##包层次依赖关系
+## 包层次依赖关系
 ```
 <!-- level 1：最基础的平台 -->
 js/bootstrap.js
